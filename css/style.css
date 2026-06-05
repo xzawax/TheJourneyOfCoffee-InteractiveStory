@@ -1140,7 +1140,11 @@ em     { font-style: italic; color: var(--clr-caramel); }
 /* ============================================================
    18. RESPONSIVE — TABLET (≥ 768px)
    ============================================================ */
-
+@media(max-width:900px){
+  .hero__canvas-container{
+    pointer-events:none;
+  }
+}
 @media (min-width: 768px) {
 
   :root {
