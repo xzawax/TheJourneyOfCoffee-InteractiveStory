@@ -370,19 +370,46 @@ function initThreeJS() {
     controls.enabled = false;
   });
 
-  // Touch: enable controls on touch devices
-  container.addEventListener('touchstart', () => {
-    isHovered        = true;
-    controls.enabled = true;
+  // Touch: distinguish scroll (vertical) from orbit drag (horizontal).
+  // We wait for the first touchmove to see the direction before
+  // committing to OrbitControls — this keeps page scroll unblocked.
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchIntent = null; // 'orbit' | 'scroll' | null
+
+  container.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchIntent = null;           // reset — direction unknown yet
+    controls.enabled = false;     // keep disabled until we know intent
+  }, { passive: true });
+
+  container.addEventListener('touchmove', (e) => {
+    if (touchIntent !== null) return; // already decided this gesture
+
+    const dx = Math.abs(e.touches[0].clientX - touchStartX);
+    const dy = Math.abs(e.touches[0].clientY - touchStartY);
+
+    // Need at least 6px movement before deciding
+    if (dx < 6 && dy < 6) return;
+
+    if (dx > dy) {
+      // Horizontal dominant → treat as orbit drag
+      touchIntent      = 'orbit';
+      isHovered        = true;
+      controls.enabled = true;
+    } else {
+      // Vertical dominant → treat as scroll, keep canvas out of the way
+      touchIntent      = 'scroll';
+      controls.enabled = false;
+    }
   }, { passive: true });
 
   container.addEventListener('touchend', () => {
-    // Small delay so last touch doesn't snap back
-    setTimeout(() => {
-      isHovered        = false;
-      controls.enabled = false;
-    }, 1500);
-  });
+    touchIntent      = null;
+    isHovered        = false;
+    controls.enabled = false;
+  }, { passive: true });
 
   // --- Resize handler ---
   function onResize() {
