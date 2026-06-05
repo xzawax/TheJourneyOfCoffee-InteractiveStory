@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="The Journey of Coffee — an interactive infographic tracing every step from bean to cup."
+    />
+
+    <title>The Journey of Coffee: From Bean to Cup</title>
+
+    <!-- Preconnect for Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fonts: Playfair Display (display) + DM Sans (body) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+
+    <!-- =============================================
+         SCROLL PROGRESS BAR
+         GSAP hook: js updates --scroll-progress CSS var
+    ============================================= -->
+    <div class="progress-bar" role="progressbar" aria-label="Reading progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar__fill" data-gsap="progress-fill"></div>
+    </div>
+
+
+    <!-- =============================================
+         NAV — Stage indicator dots
+    ============================================= -->
+    <nav class="stage-nav" aria-label="Journey stages">
+      <ol class="stage-nav__list" role="list">
+        <li class="stage-nav__item">
+          <a class="stage-nav__dot" href="#section-hero" aria-label="Start: Hero" data-stage="0">
+            <span class="stage-nav__label">Start</span>
+          </a>
+        </li>
+        <li class="stage-nav__item">
+          <a class="stage-nav__dot" href="#section-origin" aria-label="Stage 1: Origin" data-stage="1">
+            <span class="stage-nav__label">Origin</span>
+          </a>
+        </li>
+        <li class="stage-nav__item">
+          <a class="stage-nav__dot" href="#section-harvest" aria-label="Stage 2: Harvest" data-stage="2">
+            <span class="stage-nav__label">Harvest</span>
+          </a>
+        </li>
+        <li class="stage-nav__item">
+          <a class="stage-nav__dot" href="#section-roasting" aria-label="Stage 3: Roasting" data-stage="3">
+            <span class="stage-nav__label">Roasting</span>
+          </a>
+        </li>
+        <li class="stage-nav__item">
+          <a class="stage-nav__dot" href="#section-brewing" aria-label="Stage 4: Brewing" data-stage="4">
+            <span class="stage-nav__label">Brewing</span>
+          </a>
+        </li>
+        <li class="stage-nav__item">
+          <a class="stage-nav__dot" href="#section-flavour" aria-label="Stage 4b: Flavour" data-stage="4">
+            <span class="stage-nav__label">Flavour</span>
+          </a>
+        </li>
+        <li class="stage-nav__item">
+          <a class="stage-nav__dot" href="#section-ratio" aria-label="Stage 4c: Ratio" data-stage="4">
+            <span class="stage-nav__label">Ratio</span>
+          </a>
+        </li>
+        <li class="stage-nav__item">
+          <a class="stage-nav__dot" href="#section-cup" aria-label="Stage 5: The Cup" data-stage="5">
+            <span class="stage-nav__label">The Cup</span>
+          </a>
+        </li>
+      </ol>
+    </nav>
+
+
+    <!-- =============================================
+         MAIN CONTENT
+    ============================================= -->
+    <main id="main-content">
+
+
+      <!-- ==========================================
+           S0 — HERO
+           GSAP hooks:
+             data-gsap="hero-title"    → stagger letter reveal
+             data-gsap="hero-sub"      → fade-up after title
+             data-gsap="hero-scroll"   → bounce loop
+             data-gsap="hero-bg"       → slow parallax drift
+      =========================================== -->
+      <section
+        id="section-hero"
+        class="hero section"
+        aria-labelledby="hero-title"
+        data-section="0"
+      >
+        <!-- Optional: Three.js canvas mount point -->
+        <div class="hero__canvas-container" data-threejs="hero-canvas" aria-hidden="true"></div>
+
+        <!-- Background decorative layer -->
+        <div class="hero__bg" data-gsap="hero-bg" aria-hidden="true">
+          <div class="hero__bg-circle hero__bg-circle--1"></div>
+          <div class="hero__bg-circle hero__bg-circle--2"></div>
+        </div>
+
+        <div class="hero__inner container">
+          <div class="hero__content">
+
+            <!-- Stage label -->
+            <p class="hero__eyebrow" data-gsap="hero-eyebrow" aria-hidden="true">
+              An Interactive Story
+            </p>
+
+            <!-- Main title — split into spans for GSAP char animation -->
+            <h1 id="hero-title" class="hero__title" data-gsap="hero-title">
+              <span class="hero__title-line" aria-hidden="true">The Journey</span>
+              <span class="hero__title-line hero__title-line--italic" aria-hidden="true">of Coffee</span>
+              <!-- Visually hidden full title for screen readers -->
+              <span class="sr-only">The Journey of Coffee: From Bean to Cup</span>
+            </h1>
+
+            <p class="hero__subtitle" data-gsap="hero-sub">
+              From a hillside farm to your morning ritual — five stages, one story.
+            </p>
+
+          </div>
+
+          <!-- Scroll cue -->
+          <div class="hero__scroll-cue" data-gsap="hero-scroll" aria-hidden="true">
+            <span class="hero__scroll-label">Scroll to begin</span>
+            <div class="hero__scroll-arrow">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ==========================================
+           S1 — ORIGIN
+           GSAP hooks:
+             data-gsap="section-reveal"  → ScrollTrigger fade-up (all sections)
+             data-gsap="stat-count"      → number count-up
+             data-gsap="visual-enter"    → scale + fade in on scroll
+      =========================================== -->
+      <section
+        id="section-origin"
+        class="stage stage--origin section"
+        aria-labelledby="origin-title"
+        data-section="1"
+        data-gsap="section-reveal"
+      >
+        <div class="container stage__inner">
+
+          <!-- Visual side -->
+          <div class="stage__visual" data-gsap="visual-enter" aria-hidden="true">
+            <div class="stage__visual-frame stage__visual-frame--tall">
+              <!-- Coffee Origins Explorer — built by JS -->
+              <div class="origins__explorer">
+                <div class="origins__grid" role="list" aria-label="Coffee producing countries"></div>
+                <div class="origins__detail" hidden aria-live="polite"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content side -->
+          <div class="stage__content">
+            <p class="stage__number" aria-hidden="true">01</p>
+
+            <h2 id="origin-title" class="stage__title" data-gsap="text-reveal">
+              Where It All Begins
+            </h2>
+
+            <p class="stage__body">
+              Coffee grows only within the <strong>Bean Belt</strong> — a narrow equatorial band
+              stretching between the Tropics of Cancer and Capricorn. Rich volcanic soil,
+              high altitude, and consistent rainfall create the perfect conditions
+              for <em>Coffea arabica</em> and <em>Coffea robusta</em> to thrive.
+            </p>
+
+            <!-- Stat callout — GSAP count-up target -->
+            <div class="stat-card" data-gsap="stat-count">
+              <span class="stat-card__number" data-count-target="70">0</span>
+              <span class="stat-card__unit">countries</span>
+              <p class="stat-card__label">grow coffee commercially</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ==========================================
+           S2 — HARVEST
+           GSAP hooks:
+             data-gsap="section-reveal"
+             data-gsap="visual-enter"
+             data-gsap="text-reveal"
+             data-gsap="stat-count"
+      =========================================== -->
+      <section
+        id="section-harvest"
+        class="stage stage--harvest section"
+        aria-labelledby="harvest-title"
+        data-section="2"
+        data-gsap="section-reveal"
+      >
+        <div class="container stage__inner stage__inner--reverse">
+
+          <!-- Content side -->
+          <div class="stage__content">
+            <p class="stage__number" aria-hidden="true">02</p>
+
+            <h2 id="harvest-title" class="stage__title" data-gsap="text-reveal">
+              Picked by Hand
+            </h2>
+
+            <p class="stage__body">
+              Each coffee cherry is handpicked at peak ripeness — a bright, deep red.
+              Skilled pickers can strip an entire branch or selectively choose only the
+              ripest cherries. This labour-intensive process defines the cup quality
+              before anything else happens.
+            </p>
+
+            <!-- Stat callout -->
+            <div class="stat-card" data-gsap="stat-count">
+              <span class="stat-card__number" data-count-target="2000">0</span>
+              <span class="stat-card__unit">cherries</span>
+              <p class="stat-card__label">to produce one 500g bag of coffee</p>
+            </div>
+          </div>
+
+          <!-- Visual side -->
+          <div class="stage__visual" data-gsap="visual-enter" aria-hidden="true">
+            <div class="stage__visual-frame">
+              <!-- CSS illustration: coffee cherry cluster placeholder -->
+              <div class="harvest__cherry-group" data-gsap="cherry-float">
+                <div class="harvest__cherry harvest__cherry--1"></div>
+                <div class="harvest__cherry harvest__cherry--2"></div>
+                <div class="harvest__cherry harvest__cherry--3"></div>
+                <div class="harvest__cherry harvest__cherry--4"></div>
+                <div class="harvest__cherry harvest__cherry--5"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ==========================================
+           S3 — ROASTING
+           GSAP hooks:
+             data-gsap="section-reveal"
+             data-gsap="visual-enter"
+             data-gsap="text-reveal"
+             data-gsap="roast-bean"   → colour tween Light→Dark on hover
+      =========================================== -->
+      <section
+        id="section-roasting"
+        class="stage stage--roasting section"
+        aria-labelledby="roasting-title"
+        data-section="3"
+        data-gsap="section-reveal"
+      >
+        <div class="container stage__inner">
+
+          <!-- Visual side — interactive bean colour -->
+          <div class="stage__visual" data-gsap="visual-enter" aria-hidden="true">
+            <div class="stage__visual-frame">
+
+              <!-- Roast level interactive element -->
+              <figure class="roast__figure" aria-label="Coffee bean roast levels">
+                <div class="roast__bean-display">
+                  <div class="roast__bean" data-gsap="roast-bean" role="img" aria-label="Coffee bean colour indicator"></div>
+                </div>
+                <!-- Hover cards — JS will handle active state -->
+                <div class="roast__levels" role="list">
+                  <button
+                    class="roast__level roast__level--light is-active"
+                    data-roast="light"
+                    aria-pressed="true"
+                    type="button"
+                  >
+                    <span class="roast__level-dot"></span>
+                    <span class="roast__level-name">Light</span>
+                    <span class="roast__level-temp">196 °C</span>
+                  </button>
+                  <button
+                    class="roast__level roast__level--medium"
+                    data-roast="medium"
+                    aria-pressed="false"
+                    type="button"
+                  >
+                    <span class="roast__level-dot"></span>
+                    <span class="roast__level-name">Medium</span>
+                    <span class="roast__level-temp">210 °C</span>
+                  </button>
+                  <button
+                    class="roast__level roast__level--dark"
+                    data-roast="dark"
+                    aria-pressed="false"
+                    type="button"
+                  >
+                    <span class="roast__level-dot"></span>
+                    <span class="roast__level-name">Dark</span>
+                    <span class="roast__level-temp">225 °C</span>
+                  </button>
+                </div>
+              </figure>
+
+            </div>
+          </div>
+
+          <!-- Content side -->
+          <div class="stage__content">
+            <p class="stage__number" aria-hidden="true">03</p>
+
+            <h2 id="roasting-title" class="stage__title" data-gsap="text-reveal">
+              The Defining Moment
+            </h2>
+
+            <p class="stage__body">
+              Heat transforms a pale green bean into the aromatic brown one we know.
+              The <strong>Maillard reaction</strong> produces over 800 distinct aroma compounds.
+              Roast level — light, medium, or dark — shapes everything: acidity,
+              sweetness, bitterness, and body.
+            </p>
+
+            <!-- Stat callout -->
+            <div class="stat-card" data-gsap="stat-count">
+              <span class="stat-card__number" data-count-target="800">0</span>
+              <span class="stat-card__unit">+</span>
+              <p class="stat-card__label">aroma compounds created during roasting</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ==========================================
+           S4 — BREWING
+           GSAP hooks:
+             data-gsap="section-reveal"
+             data-gsap="brew-cards-stagger"  → staggered card entrance
+             data-gsap="text-reveal"
+      =========================================== -->
+      <section
+        id="section-brewing"
+        class="stage stage--brewing section"
+        aria-labelledby="brewing-title"
+        data-section="4"
+        data-gsap="section-reveal"
+      >
+        <div class="container">
+
+          <div class="stage__content stage__content--centered">
+            <p class="stage__number" aria-hidden="true">04</p>
+
+            <h2 id="brewing-title" class="stage__title" data-gsap="text-reveal">
+              Ritual &amp; Precision
+            </h2>
+
+            <p class="stage__body stage__body--centered">
+              Water temperature, contact time, and grind size determine extraction.
+              Every method tells a different story in the cup.
+            </p>
+          </div>
+
+          <!-- Brew method cards — GSAP stagger entrance + hover lift -->
+          <ul class="brew-methods" role="list" data-gsap="brew-cards-stagger">
+
+            <li class="brew-card" data-gsap="brew-card-item">
+              <article class="brew-card__inner" aria-labelledby="brew-espresso">
+                <div class="brew-card__icon" aria-hidden="true">
+                  <!-- CSS shape: espresso cup -->
+                  <div class="brew-icon brew-icon--espresso"></div>
+                </div>
+                <h3 id="brew-espresso" class="brew-card__name">Espresso</h3>
+                <dl class="brew-card__specs">
+                  <div class="brew-card__spec">
+                    <dt>Grind</dt>
+                    <dd>Very fine</dd>
+                  </div>
+                  <div class="brew-card__spec">
+                    <dt>Temp</dt>
+                    <dd>93 °C</dd>
+                  </div>
+                  <div class="brew-card__spec">
+                    <dt>Time</dt>
+                    <dd>25–30 s</dd>
+                  </div>
+                </dl>
+              </article>
+            </li>
+
+            <li class="brew-card" data-gsap="brew-card-item">
+              <article class="brew-card__inner" aria-labelledby="brew-pourover">
+                <div class="brew-card__icon" aria-hidden="true">
+                  <!-- CSS shape: pour over dripper -->
+                  <div class="brew-icon brew-icon--pourover"></div>
+                </div>
+                <h3 id="brew-pourover" class="brew-card__name">Pour Over</h3>
+                <dl class="brew-card__specs">
+                  <div class="brew-card__spec">
+                    <dt>Grind</dt>
+                    <dd>Medium</dd>
+                  </div>
+                  <div class="brew-card__spec">
+                    <dt>Temp</dt>
+                    <dd>90–96 °C</dd>
+                  </div>
+                  <div class="brew-card__spec">
+                    <dt>Time</dt>
+                    <dd>3–4 min</dd>
+                  </div>
+                </dl>
+              </article>
+            </li>
+
+            <li class="brew-card" data-gsap="brew-card-item">
+              <article class="brew-card__inner" aria-labelledby="brew-french">
+                <div class="brew-card__icon" aria-hidden="true">
+                  <!-- CSS shape: french press -->
+                  <div class="brew-icon brew-icon--frenchpress"></div>
+                </div>
+                <h3 id="brew-french" class="brew-card__name">French Press</h3>
+                <dl class="brew-card__specs">
+                  <div class="brew-card__spec">
+                    <dt>Grind</dt>
+                    <dd>Coarse</dd>
+                  </div>
+                  <div class="brew-card__spec">
+                    <dt>Temp</dt>
+                    <dd>93–96 °C</dd>
+                  </div>
+                  <div class="brew-card__spec">
+                    <dt>Time</dt>
+                    <dd>4 min</dd>
+                  </div>
+                </dl>
+              </article>
+            </li>
+
+          </ul>
+
+        </div>
+      </section>
+
+
+      <!-- ==========================================
+           S4b — FLAVOUR WHEEL
+      =========================================== -->
+      <section
+        id="section-flavour"
+        class="stage section"
+        aria-labelledby="flavour-title"
+        data-section="4"
+        data-gsap="section-reveal"
+      >
+        <div class="container stage__inner">
+
+          <!-- Content -->
+          <div class="stage__content">
+            <p class="stage__number" aria-hidden="true">Explore</p>
+            <h2 id="flavour-title" class="stage__title" data-gsap="text-reveal">
+              The Flavour Wheel
+            </h2>
+            <p class="stage__body">
+              Coffee is one of the most complex beverages on earth — over 1,000 aromatic
+              compounds have been identified. The Specialty Coffee Association's flavour
+              wheel maps them into eight core categories. Hover each slice to explore.
+            </p>
+            <div class="fwheel__legend">
+              <p class="fwheel__legend-hint">← hover a segment</p>
+            </div>
+          </div>
+
+          <!-- Flavour Wheel SVG -->
+          <div class="stage__visual">
+            <div class="flavour-wheel" aria-label="Coffee Flavour Wheel" role="img">
+              <svg class="fwheel__svg" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+                <!-- 8 segments at 45° each -->
+                <!-- Segment paths generated via polar maths: each slice 45° -->
+                <g class="fwheel__segments">
+                  <!-- Fruity 0–45° -->
+                  <path class="fwheel__segment" d="M120,120 L120,20 A100,100 0 0,1 190.7,49.3 Z" />
+                  <!-- Floral 45–90° -->
+                  <path class="fwheel__segment" d="M120,120 L190.7,49.3 A100,100 0 0,1 220,120 Z" />
+                  <!-- Sweet 90–135° -->
+                  <path class="fwheel__segment" d="M120,120 L220,120 A100,100 0 0,1 190.7,190.7 Z" />
+                  <!-- Nutty 135–180° -->
+                  <path class="fwheel__segment" d="M120,120 L190.7,190.7 A100,100 0 0,1 120,220 Z" />
+                  <!-- Chocolatey 180–225° -->
+                  <path class="fwheel__segment" d="M120,120 L120,220 A100,100 0 0,1 49.3,190.7 Z" />
+                  <!-- Spicy 225–270° -->
+                  <path class="fwheel__segment" d="M120,120 L49.3,190.7 A100,100 0 0,1 20,120 Z" />
+                  <!-- Earthy 270–315° -->
+                  <path class="fwheel__segment" d="M120,120 L20,120 A100,100 0 0,1 49.3,49.3 Z" />
+                  <!-- Sour 315–360° -->
+                  <path class="fwheel__segment" d="M120,120 L49.3,49.3 A100,100 0 0,1 120,20 Z" />
+                </g>
+                <!-- Inner circle -->
+                <circle cx="120" cy="120" r="50" class="fwheel__inner-circle" />
+                <!-- Centre text -->
+                <text class="fwheel__centre-label" x="120" y="116" text-anchor="middle">Hover a</text>
+                <text class="fwheel__centre-label" x="120" y="132" text-anchor="middle">segment</text>
+              </svg>
+              <p class="fwheel__centre-desc">Explore the coffee flavour wheel</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ==========================================
+           S4c — BREW RATIO CALCULATOR
+      =========================================== -->
+      <section
+        id="section-ratio"
+        class="stage section"
+        aria-labelledby="ratio-title"
+        data-section="4"
+        data-gsap="section-reveal"
+      >
+        <div class="container stage__inner stage__inner--reverse">
+
+          <!-- Visual — Calculator -->
+          <div class="stage__visual">
+            <div class="ratio-calc" aria-label="Brew ratio calculator">
+              <div class="ratio-calc__row">
+                <label class="ratio-calc__label" for="ratio-coffee">Coffee</label>
+                <div class="ratio-calc__input-wrap">
+                  <input
+                    class="ratio-calc__coffee"
+                    id="ratio-coffee"
+                    type="number"
+                    value="18"
+                    min="1"
+                    max="500"
+                    step="1"
+                    aria-label="Coffee amount in grams"
+                  />
+                  <span class="ratio-calc__unit">g</span>
+                </div>
+              </div>
+
+              <div class="ratio-calc__row">
+                <label class="ratio-calc__label" for="ratio-method">Ratio</label>
+                <select class="ratio-calc__ratio" id="ratio-method" aria-label="Brew ratio">
+                  <option value="14">1:14 — Strong espresso</option>
+                  <option value="16" selected>1:16 — Pour over (SCA)</option>
+                  <option value="17">1:17 — Drip / filter</option>
+                  <option value="12">1:12 — French press</option>
+                  <option value="10">1:10 — AeroPress</option>
+                  <option value="20">1:20 — Cold brew</option>
+                </select>
+              </div>
+
+              <div class="ratio-calc__divider" aria-hidden="true"></div>
+
+              <div class="ratio-calc__result">
+                <div class="ratio-calc__result-item">
+                  <span class="ratio-calc__result-label">Water needed</span>
+                  <span class="ratio-calc__water-out ratio-calc__result-value" aria-live="polite">288 ml</span>
+                </div>
+                <div class="ratio-calc__result-item">
+                  <span class="ratio-calc__result-label">Yield</span>
+                  <span class="ratio-calc__cups-out ratio-calc__result-value" aria-live="polite">≈ 1 cup</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="stage__content">
+            <p class="stage__number" aria-hidden="true">Calculator</p>
+            <h2 id="ratio-title" class="stage__title" data-gsap="text-reveal">
+              Dial In Your Ratio
+            </h2>
+            <p class="stage__body">
+              The coffee-to-water ratio is the single biggest variable under your
+              control. The Specialty Coffee Association recommends <strong>1:16–1:18</strong>
+              for filter brewing — but taste is subjective. Use the calculator to find
+              your sweet spot.
+            </p>
+            <p class="stage__body">
+              A <em>stronger</em> ratio amplifies body and bitterness. Going lighter
+              opens up delicate floral and fruity notes that bold brews can mask.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ==========================================
+           S5 — THE CUP (Closing)
+           GSAP hooks:
+             data-gsap="section-reveal"
+             data-gsap="cup-steam"    → rising steam loop
+             data-gsap="final-stat"   → large number count-up
+             data-gsap="text-reveal"
+      =========================================== -->
+      <section
+        id="section-cup"
+        class="cup section"
+        aria-labelledby="cup-title"
+        data-section="5"
+        data-gsap="section-reveal"
+      >
+        <div class="container cup__inner">
+
+          <!-- Cup illustration + steam -->
+          <figure class="cup__figure" aria-label="A steaming cup of coffee">
+            <div class="cup__illustration" aria-hidden="true">
+              <!-- CSS: cup body + saucer -->
+              <div class="cup__saucer"></div>
+              <div class="cup__body">
+                <div class="cup__liquid"></div>
+              </div>
+              <div class="cup__handle"></div>
+            </div>
+
+            <!-- Steam lines — CSS animated, GSAP adds entrance -->
+            <div class="cup__steam" data-gsap="cup-steam" aria-hidden="true">
+              <div class="cup__steam-line cup__steam-line--1"></div>
+              <div class="cup__steam-line cup__steam-line--2"></div>
+              <div class="cup__steam-line cup__steam-line--3"></div>
+            </div>
+          </figure>
+
+          <!-- Final content -->
+          <div class="cup__content">
+            <p class="stage__number" aria-hidden="true">05</p>
+
+            <h2 id="cup-title" class="cup__title" data-gsap="text-reveal">
+              The Cup
+            </h2>
+
+            <p class="stage__body">
+              Every sip carries the work of farmers, processors, roasters, and baristas.
+              A single cup is the end of a journey thousands of kilometres long.
+            </p>
+
+            <!-- Hero stat — big count-up moment -->
+            <div class="final-stat" data-gsap="final-stat">
+              <span class="final-stat__number" data-count-target="2000000000">0</span>
+              <p class="final-stat__label">cups of coffee consumed every single day</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+    </main><!-- /main -->
+
+
+    <!-- =============================================
+         FOOTER
+    ============================================= -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="container site-footer__inner">
+        <p class="site-footer__credit">
+          Crafted with care &amp; GSAP &mdash; a frontend assessment project.
+        </p>
+      </div>
+    </footer>
+
+
+    <!-- =============================================
+         SCRIPTS
+         GSAP + ScrollTrigger loaded from CDN
+    ============================================= -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <!-- Three.js + OrbitControls -->
+    <script src="https://unpkg.com/three@0.134.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="js/main.js" defer></script>
+
+  </body>
+</html>
