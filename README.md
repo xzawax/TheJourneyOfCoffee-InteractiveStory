@@ -131,3 +131,8 @@ All type scales via `clamp()` — fluid between breakpoints, no layout jumps.
 
 ---
 *Frontend assessment project — built with GSAP, Three.js, and zero build tools.*
+
+
+## Embedding
+For the embed experience, it would be the same, but just showcase a quick embed experience.
+the link will be /embed.html
