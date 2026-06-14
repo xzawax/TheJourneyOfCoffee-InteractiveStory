@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="The Journey of Coffee — an interactive infographic tracing every step from bean to cup."
+    />
+
+    <title>The Journey of Coffee: From Bean to Cup</title>
+
+    <!-- Preconnect for Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fonts: Playfair Display (display) + DM Sans (body) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+
+    
+
+    <!-- =============================================
+         MAIN CONTENT
+    ============================================= -->
+    <main id="main-content">
+
+
+      <!-- ==========================================
+           S0 — HERO
+           GSAP hooks:
+             data-gsap="hero-title"    → stagger letter reveal
+             data-gsap="hero-sub"      → fade-up after title
+             data-gsap="hero-scroll"   → bounce loop
+             data-gsap="hero-bg"       → slow parallax drift
+      =========================================== -->
+      <section
+        id="section-hero2"
+        class="hero section"
+        aria-labelledby="hero-title"
+        data-section="0"
+      >
+        <div data-component="hero-canvas"></div>
+
+      </section>
+
+
+      <section
+        id="section-origin"
+        class="stage stage--origin section"
+        aria-labelledby="origin-title"
+        data-section="1"
+        data-gsap="section-reveal"
+      >
+        <div class="container stage__inner">
+
+          <!-- Visual side -->
+          <div class="stage__visual" data-gsap="visual-enter" aria-hidden="true">
+            <div class="stage__visual-frame stage__visual-frame--tall">
+
+              <div data-component="origins-explorer"></div>
+            </div>
+          </div>
+
+          
+          <div class="stage__visual" data-gsap="visual-enter" aria-hidden="true">
+            <div class="stage__visual-frame">
+              <div data-component="cherry-cluster"></div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main><!-- /main -->
+
+    <!-- =============================================
+         FOOTER
+    ============================================= -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="container site-footer__inner">
+        <p class="site-footer__credit">
+          Crafted with care &amp; GSAP &mdash; a frontend assessment project.
+        </p>
+      </div>
+    </footer>
+
+    <!-- =============================================
+         SCRIPTS
+         GSAP + ScrollTrigger loaded from CDN
+    ============================================= -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- Three.js + addons — already no defer, this is fine -->
+    <script src="https://unpkg.com/three@0.134.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script type="module" src="js/main.js"></script>
+
+
+  </body>
+</html>

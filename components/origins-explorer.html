@@ -1,0 +1,24 @@
+<!--
+  Component: origins-explorer
+  Interactive card grid for coffee-producing countries.
+  Cards and detail panel are rendered by JS (OriginsExplorer.js).
+
+  Usage in HTML:
+    <div data-component="origins-explorer"></div>
+
+  JS counterpart: components/js/OriginsExplorer.js
+  The .origins__grid and .origins__detail are intentionally
+  empty — OriginsExplorer.js populates them at runtime.
+-->
+<div class="origins__explorer">
+  <div
+    class="origins__grid"
+    role="list"
+    aria-label="Coffee producing countries"
+  ></div>
+  <div
+    class="origins__detail"
+    hidden
+    aria-live="polite"
+  ></div>
+</div>

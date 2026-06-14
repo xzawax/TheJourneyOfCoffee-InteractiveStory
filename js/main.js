@@ -1,4 +1,15 @@
 /* ============================================================
+   COMPONENT IMPORTS
+   ES module imports — no <script> tags needed for these.
+   Your HTML only needs one tag:
+     <script type="module" src="js/main.js"></script>
+   ============================================================ */
+import { loadComponents } from './components/ComponentLoader.js';
+import initHeroCanvas    from './components/hero-canvas.js';
+import initOriginsExplorerComponent from './components/origins-explorer.js';
+import initCherryCluster from './components/cherry-cluster.js';
+
+/* ============================================================
    THE JOURNEY OF COFFEE — main.js
    Architecture:
      1.  Config & Constants
@@ -244,406 +255,39 @@ function initHero() {
 
 /* ============================================================
    7. MODULE: THREE.JS HERO CANVAS
-   - Renders a 3D coffee bean shape (TorusKnot as placeholder,
-     swap geometry for your .glb bean via GLTFLoader)
-   - Auto-spins on Y axis
-   - Hover → pauses spin, enables OrbitControls drag
-   - Mouseleave → resumes auto-spin from current rotation
-   - Transparent background so CSS bg circles show through
+   → Handled by js/components/hero-canvas.js
    ============================================================ */
 
 function initThreeJS() {
-  const container = qs('[data-threejs="hero-canvas"]');
-
-  // Bail silently if Three.js not loaded or container missing
-  if (!container || typeof THREE === 'undefined') return;
-
-  // --- Scene setup ---
-  const scene    = new THREE.Scene();
-  const camera   = new THREE.PerspectiveCamera(
-    45,
-    container.clientWidth / container.clientHeight,
-    0.1,
-    100
-  );
-  camera.position.set(0, 0, 4.5);
-
-  const renderer = new THREE.WebGLRenderer({
-    antialias:  true,
-    alpha:      true,         // transparent background
-  });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.setClearColor(0x000000, 0);
-  container.appendChild(renderer.domElement);
-
-  // --- Lighting ---
-  // Warm ambient fill
-  const ambient = new THREE.AmbientLight(0xfff3e0, 0.6);
-  scene.add(ambient);
-
-  // Key light — caramel warm
-  const keyLight = new THREE.DirectionalLight(0xc8843a, 1.8);
-  keyLight.position.set(3, 4, 3);
-  scene.add(keyLight);
-
-  // Rim light — cool contrast
-  const rimLight = new THREE.DirectionalLight(0x3a2010, 0.8);
-  rimLight.position.set(-3, -2, -2);
-  scene.add(rimLight);
-
-  // --- Geometry: Coffee Bean shape ---
-  // Using a flattened sphere + crease line as placeholder.
-  // To swap in your .glb: comment out beanGroup creation below,
-  // use THREE.GLTFLoader and add loaded scene to beanGroup.
-  const beanGroup = new THREE.Group();
-
-  const loader = new THREE.GLTFLoader();
-
-  loader.load('object/coffee_bean.glb', (gltf) => {
-      beanGroup.add(gltf.scene);
-  });
-
-  // // Bean body — scaled sphere (oval / bean-like)
-  // const bodyGeo = new THREE.SphereGeometry(1, 64, 64);
-  // const bodyMat = new THREE.MeshStandardMaterial({
-  //   color:     0x6b3318,
-  //   roughness: 0.55,
-  //   metalness: 0.05,
-  // });
-  // const body = new THREE.Mesh(bodyGeo, bodyMat);
-  // body.scale.set(0.9, 1.2, 0.6);   // flatten into bean oval
-  // beanGroup.add(body);
-  beanGroup.scale.set(0.5,0.5,0.5)
-  // beanGroup.rotation.set(1,1.5,0.5)
-  beanGroup.rotation.z = 1;
-  // beanGroup.position.set(1,0,0)
-  // camera.position.x += 1;
-
-  // Centre crease — thin torus along the bean's equator
-  const creaseGeo = new THREE.TorusGeometry(0.62, 0.04, 16, 80);
-  const creaseMat = new THREE.MeshStandardMaterial({
-    color:     0x3b1509,
-    roughness: 0.8,
-    metalness: 0.0,
-  });
-  const crease = new THREE.Mesh(creaseGeo, creaseMat);
-  crease.rotation.x = Math.PI / 2;
-  crease.scale.set(1, 1, 0.01);    // flatten crease to a line on bean surface
-  beanGroup.add(crease);
-
-  scene.add(beanGroup);
-
-  // --- OrbitControls ---
-  const controls        = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.06;
-  controls.enableZoom    = false;
-  controls.enablePan     = false;
-  controls.enabled       = false;   // disabled until hover
-
-  
-  controls.target.set(0, 0, 0);
-  controls.update();
-
-  // --- Auto-spin state ---
-  let isHovered    = false;
-  let autoSpinSpeed = 0.004;        // radians per frame
-
-  // Hover: pause spin, hand off to OrbitControls
-  container.addEventListener('mouseenter', () => {
-    // isHovered        = true;
-    controls.enabled = true;
-  });
-
-  container.addEventListener('mousedown', () => {
-    isHovered        = true;
-    controls.enabled = true;
-  });
-
-  container.addEventListener('mouseup', () => {
-    isHovered        = false;
-  });
-
-  container.addEventListener('mouseleave', () => {
-    isHovered        = false;
-    controls.enabled = false;
-  });
-
-  // Touch: distinguish scroll (vertical) from orbit drag (horizontal).
-  // We wait for the first touchmove to see the direction before
-  // committing to OrbitControls — this keeps page scroll unblocked.
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchIntent = null; // 'orbit' | 'scroll' | null
-
-  container.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchIntent = null;           // reset — direction unknown yet
-    controls.enabled = false;     // keep disabled until we know intent
-  }, { passive: true });
-
-  container.addEventListener('touchmove', (e) => {
-    if (touchIntent !== null) return; // already decided this gesture
-
-    const dx = Math.abs(e.touches[0].clientX - touchStartX);
-    const dy = Math.abs(e.touches[0].clientY - touchStartY);
-
-    // Need at least 6px movement before deciding
-    if (dx < 6 && dy < 6) return;
-
-    if (dx > dy) {
-      // Horizontal dominant → treat as orbit drag
-      touchIntent      = 'orbit';
-      isHovered        = true;
-      controls.enabled = true;
-    } else {
-      // Vertical dominant → treat as scroll, keep canvas out of the way
-      touchIntent      = 'scroll';
-      controls.enabled = false;
-    }
-  }, { passive: true });
-
-  container.addEventListener('touchend', () => {
-    touchIntent      = null;
-    isHovered        = false;
-    controls.enabled = false;
-  }, { passive: true });
-
-  // --- Resize handler ---
-  function onResize() {
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h);
-  }
-  window.addEventListener('resize', onResize);
-
-  // --- GSAP entrance: bean scales in when page loads ---
-  gsap.from(beanGroup.scale, {
-    x:        0,
-    y:        0,
-    z:        0,
-    duration: 1.6,
-    ease:     'elastic.out(1, 0.6)',
-    delay:    0.8,
-  });
-
-  // --- Render loop ---
-  function tick() {
-    requestAnimationFrame(tick);
-
-    if (!isHovered && !prefersReducedMotion) {
-      beanGroup.rotation.y += autoSpinSpeed;
-      beanGroup.rotation.x  = Math.sin(Date.now() * 0.0004) * 0.15; // gentle wobble
-    }
-
-    controls.update();
-    renderer.render(scene, camera);
-  }
-
-  tick();
-
-  // --- Tooltip hint: show on first load, hide after 3s ---
-  const hint = document.createElement('p');
-  hint.textContent = 'Drag to rotate';
-  hint.style.cssText = `
-    position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
-    font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase;
-    color:rgba(240,230,211,0.45); pointer-events:none;
-    transition:opacity 0.6s ease;
-  `;
-  container.style.position = 'absolute';
-  container.appendChild(hint);
-  setTimeout(() => { hint.style.opacity = '0'; }, 3000);
+  initHeroCanvas();
+  // Pass options if needed: initHeroCanvas({ glbPath: 'object/coffee_bean.glb' });
 }
+
 
 
 /* ============================================================
    8. MODULE: COFFEE ORIGINS EXPLORER
-   Interactive cards for major coffee-producing countries.
-   Click a region to reveal tasting notes & production facts.
+   → Handled by js/components/origins-explorer.js
    ============================================================ */
 
-const ORIGINS_DATA = [
-  {
-    code: 'ET', country: 'Ethiopia', region: 'Africa',
-    flag: '🇪🇹', altitude: '1,500–2,200m',
-    profile: 'Blueberry · Jasmine · Bergamot',
-    note: 'Birthplace of Arabica. Natural-processed coffees from Yirgacheffe are legendary for their floral intensity.',
-    production: '450K',
-  },
-  {
-    code: 'CO', country: 'Colombia', region: 'Americas',
-    flag: '🇨🇴', altitude: '1,200–2,000m',
-    profile: 'Caramel · Red Apple · Hazelnut',
-    note: 'Two harvests a year and a mountain geography that creates distinctive micro-climates for exceptional balance.',
-    production: '860K',
-  },
-  {
-    code: 'BR', country: 'Brazil', region: 'Americas',
-    flag: '🇧🇷', altitude: '800–1,200m',
-    profile: 'Dark Chocolate · Walnut · Brown Sugar',
-    note: 'The world\'s largest producer. Low-acid, full-bodied naturals form the backbone of most espresso blends.',
-    production: '3.5M',
-  },
-  {
-    code: 'ID', country: 'Indonesia', region: 'Asia-Pacific',
-    flag: '🇮🇩', altitude: '1,000–1,700m',
-    profile: 'Dark Earth · Cedar · Tobacco',
-    note: 'Wet-hulled "Giling Basah" processing gives Sumatran coffees their distinctively deep, syrupy body.',
-    production: '660K',
-  },
-  {
-    code: 'GT', country: 'Guatemala', region: 'Americas',
-    flag: '🇬🇹', altitude: '1,300–2,000m',
-    profile: 'Toffee · Dark Cherry · Spice',
-    note: 'Volcanic soil and cool highland air create complex coffees. Antigua is the country\'s most celebrated region.',
-    production: '210K',
-  },
-  {
-    code: 'YE', country: 'Yemen', region: 'Arabia',
-    flag: '🇾🇪', altitude: '1,500–2,500m',
-    profile: 'Wine · Dried Fruit · Cardamom',
-    note: 'Ancient terraced farms and heirloom varieties make Yemeni coffees some of the rarest in the world.',
-    production: '22K',
-  },
-];
-
 function initOriginsExplorer() {
-  const container = document.querySelector('.origins__explorer');
-  if (!container) return;
-
-  const grid   = container.querySelector('.origins__grid');
-  const detail = container.querySelector('.origins__detail');
-
-  let activeCode = null;
-
-  // Build cards
-  ORIGINS_DATA.forEach((origin, i) => {
-    const card = document.createElement('button');
-    card.className = 'origins__card';
-    card.dataset.code = origin.code;
-    card.setAttribute('type', 'button');
-    card.setAttribute('aria-expanded', 'false');
-    card.innerHTML = `
-      <span class="origins__card-flag">${origin.flag}</span>
-      <span class="origins__card-name">${origin.country}</span>
-      <span class="origins__card-region">${origin.region}</span>
-    `;
-
-    card.addEventListener('click', () => {
-      const isAlreadyActive = activeCode === origin.code;
-
-      // Reset all cards
-      grid.querySelectorAll('.origins__card').forEach(c => {
-        c.classList.remove('is-active');
-        c.setAttribute('aria-expanded', 'false');
-      });
-
-      if (isAlreadyActive) {
-        // activeCode = null;
-        // gsap.to(detail, { opacity: 0, y: 10, duration: 0.3, ease: 'power2.in',
-        //   onComplete: () => { detail.hidden = true; detail.innerHTML = ''; }
-        // });
-        return;
-      }
-
-      card.classList.add('is-active');
-      card.setAttribute('aria-expanded', 'true');
-      activeCode = origin.code;
-
-      detail.hidden = false;
-      detail.innerHTML = `
-        <div class="origins__detail-inner">
-          <div class="origins__detail-header">
-            <span class="origins__detail-flag">${origin.flag}</span>
-            <div>
-              <h4 class="origins__detail-country">${origin.country}</h4>
-              <span class="origins__detail-region">${origin.region}</span>
-            </div>
-          </div>
-          <div class="origins__detail-meta">
-            <div class="origins__meta-item">
-              <span class="origins__meta-label">Altitude</span>
-              <span class="origins__meta-value">${origin.altitude}</span>
-            </div>
-            <div class="origins__meta-item">
-              <span class="origins__meta-label">Production</span>
-              <span class="origins__meta-value">${origin.production} bags/yr</span>
-            </div>
-          </div>
-          <div class="origins__detail-profile">
-            <span class="origins__profile-label">Tasting Notes</span>
-            <span class="origins__profile-tags">${origin.profile}</span>
-          </div>
-          <p class="origins__detail-note">${origin.note}</p>
-        </div>
-      `;
-
-      gsap.fromTo(detail,
-        { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }
-      );
-    });
-
-    // Stagger entrance
-    if (!prefersReducedMotion) {
-      gsap.from(card, {
-        opacity: 0, y: 24, scale: 0.95,
-        duration: 0.5,
-        ease: 'power3.out',
-        delay: 0.08 * i,
-        scrollTrigger: { trigger: '#section-origin', start: 'top 70%' },
-      });
-    }
-
-    grid.appendChild(card);
-  });
+  initOriginsExplorerComponent();
+  // Pass options if needed: initOriginsExplorerComponent({ scrollTrigger: '#section-origin' });
 }
+
 
 
 
 /* ============================================================
    9. MODULE: HARVEST CHERRY FLOAT
-   Continuous gentle float on the cherry group —
-   organic, not mechanical: each cherry has a slight
-   individual offset so they move independently.
+   → Handled by js/components/cherry-cluster.js
    ============================================================ */
 
 function initCherryFloat() {
-  const group    = qs('[data-gsap="cherry-float"]');
-  const cherries = qsa('.harvest__cherry', group || document);
-
-  if (!group) return;
-  if (prefersReducedMotion) return;
-
-  // Float the whole group — slow drift
-  gsap.to(group, {
-    y:        -12,
-    rotation: 3,
-    duration: 3.2,
-    ease:     'sine.inOut',
-    yoyo:     true,
-    repeat:   -1,
-  });
-
-  // Each cherry has a subtle individual micro-float for organic feel
-  cherries.forEach((cherry, i) => {
-    gsap.to(cherry, {
-      y:        -(4 + i * 1.5),
-      x:        (i % 2 === 0 ? 2 : -2),
-      rotation: (i % 2 === 0 ? 4 : -3),
-      duration: 2.2 + i * 0.3,
-      ease:     'sine.inOut',
-      yoyo:     true,
-      repeat:   -1,
-      delay:    i * 0.18,
-    });
-  });
+  initCherryCluster();
+  // Pass options if needed: initCherryCluster({ groupDrift: 16 });
 }
+
 
 
 /* ============================================================
@@ -965,20 +609,21 @@ function initRatioCalc() {
   update();
 }
 
-
 /* ============================================================
    15. INIT
    ============================================================ */
 
-function init() {
+async function init() {
   if (typeof gsap === 'undefined') {
     console.warn('[coffee-journey] GSAP not found. Animations skipped.');
     return;
   }
 
+  
   gsap.config({ nullTargetWarn: false });
-  ScrollTrigger.defaults({ markers: false });
+  await loadComponents();
 
+  ScrollTrigger.defaults({ markers: false });
   initProgressBar();
   initStageNav();
   initHero();
